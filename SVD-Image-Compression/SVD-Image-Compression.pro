@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        MainWindow.cpp
+        MainWindow.cpp \
+    svdcompressor.cpp
 
 HEADERS += \
-        MainWindow.h
+        MainWindow.h \
+    svdcompressor.h
 
 FORMS += \
         MainWindow.ui
