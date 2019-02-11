@@ -20,6 +20,8 @@ public:
 private slots:
     void on_openButton_released();
 
+    void on_compressButton_released();
+
 private:
     void loadImage(const QString* filePath);
     double calcImageSizeInMB(int width,int height,int bitDepth);
@@ -27,6 +29,11 @@ private:
     const int MEGABYTE = 1048576;
     Ui::MainWindow *ui;
     QImage* image;
+
+    struct ImageData{
+        int r,g,b;
+    };
+    ImageData* imageData;
 };
 
 #endif // MAINWINDOW_H
