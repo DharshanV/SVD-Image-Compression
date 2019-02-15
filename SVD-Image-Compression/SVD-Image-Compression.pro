@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         MainWindow.cpp \
-    svdcompressor.cpp
+    svdcompressor.cpp \
+    jacobi_eigenvalue.cpp
 
 HEADERS += \
         MainWindow.h \
-    svdcompressor.h
+    svdcompressor.h \
+    jacobi_eigenvalue.h
 
 FORMS += \
         MainWindow.ui
