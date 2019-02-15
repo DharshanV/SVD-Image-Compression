@@ -5,6 +5,24 @@
 #include "QFileDialog"
 #include <string.h>
 
+/*
+ *     double a[N*N] = {
+        5,3,0,
+        3,5,0,
+        0,0,0};
+      double d[N];
+      int it_max = 100;
+      int it_num;
+      int n = N;
+      int rot_num;
+      double v[N*N];
+
+      jacobi_eigenvalue ( n, a, it_max, v, d, it_num, rot_num );
+      for(int i=0;i<n;i++){
+          cout<<"Eigen value "<<i<<" :"<< d[i]<<endl;
+      }
+ */
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -55,7 +73,6 @@ void MainWindow::on_compressButton_released()
 
     for(int i=0;i<image->height();i++){
         QRgb* rowData = reinterpret_cast<QRgb*>(image->scanLine(i));
-        //cout<<"[";
         for(int j=0;j<image->width();j++){
             QRgb* pixelData = &rowData[j];
             int index = j + (i*image->width());
@@ -63,8 +80,6 @@ void MainWindow::on_compressButton_released()
             imageData[index].r = qRed(*pixelData);
             imageData[index].g = qGreen(*pixelData);
             imageData[index].b = qBlue(*pixelData);
-            //cout<<"R: "<<qRed(pixelData)<<" G: "<<qGreen(pixelData)<<" B: "<<qBlue(pixelData)<<", ";
         }
-        //cout<<"]"<<endl;
     }
 }
