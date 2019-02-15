@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     image = NULL;
     imageData = NULL;
+    compressor = NULL;
 }
 
 void MainWindow::loadImage(const QString* filePath){
@@ -40,6 +41,7 @@ void MainWindow::loadImage(const QString* filePath){
     double total = static_cast<double>(image->sizeInBytes())/MEGABYTE;
     ui->oFileSize->setText(QString::number(total) + " M");
     imageData = new ImageData[image->width()*image->height()];
+
 }
 
 void MainWindow::on_openButton_released()

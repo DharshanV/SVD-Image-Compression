@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <iostream>
+#include "svdcompressor.h"
 using namespace std;
 
 namespace Ui {
@@ -34,6 +35,7 @@ private:
         int r,g,b;
     };
     ImageData* imageData;
+    SVDCompressor* compressor;
 };
 
 #endif // MAINWINDOW_H
