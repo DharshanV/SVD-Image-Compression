@@ -25,16 +25,14 @@ private slots:
 
 private:
     void loadImage(const QString* filePath);
-    double calcImageSizeInMB(int width,int height,int bitDepth);
+    void loadImageSize(QImage* i,QLabel* label);
+    void loadImageToLable(QImage* i,QLabel* label);
+    bool imageExists();
+
 private:
     const int MEGABYTE = 1048576;
     Ui::MainWindow *ui;
     QImage* image;
-
-    struct ImageData{
-        int r,g,b;
-    };
-    ImageData* imageData;
     SVDCompressor* compressor;
 };
 

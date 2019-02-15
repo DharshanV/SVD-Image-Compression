@@ -2,15 +2,14 @@
 #define SVDCOMPRESSOR_H
 #include <QLabel>
 #include <QImage>
+#include "jacobi_eigenvalue.h"
 
 class SVDCompressor
 {
 public:
     SVDCompressor();
-    void update();
-    void compress(QLabel* output);
-    void imageChanged();
-    void setImageLocation(QImage* image);
+    bool free();
+    void compress(QImage* image,QLabel* output);
 private:
     void loadToMatrix();
 private:

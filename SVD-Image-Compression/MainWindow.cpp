@@ -5,6 +5,16 @@
 #include "QFileDialog"
 #include <string.h>
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
+#if DEBUG
+#define LOG(x) do { std::cerr << x; } while (0)
+#else
+#define LOG(X)
+#endif
+
 /*
  *     double a[N*N] = {
         5,3,0,
@@ -29,17 +39,32 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     image = NULL;
-    imageData = NULL;
-    compressor = NULL;
+    compressor = new SVDCompressor();
 }
 
 void MainWindow::loadImage(const QString* filePath){
     image = new QImage(*filePath);
-    QPixmap pix = QPixmap::fromImage(*image);
-    ui->pictureViewer->setPixmap(pix);
-    ui->pictureViewer->setScaledContents(true);
-    double total = static_cast<double>(image->sizeInBytes())/MEGABYTE;
-    ui->oFileSize->setText(QString::number(total) + " M");
+    loadImageToLable(image,ui->pictureViewer);
+    loadImageSize(image,ui->oFileSize);
+}
+
+void MainWindow::loadImageSize(QImage* i,QLabel* label)
+{
+    double total = static_cast<double>(i->sizeInBytes())/MEGABYTE;
+    label->setText(QString::number(total) + " M");
+}
+
+void MainWindow::loadImageToLable(QImage* i, QLabel* label)
+{
+    QPixmap pix = QPixmap::fromImage(*i);
+    label->setPixmap(pix);
+    label->setScaledContents(true);
+}
+
+bool MainWindow::imageExists()
+{
+    if(image == NULL) return false;
+    return true;
 }
 
 void MainWindow::on_openButton_released()
@@ -47,20 +72,24 @@ void MainWindow::on_openButton_released()
     QFileDialog fileOpener(this);
     fileOpener.setNameFilter(tr("Images (*.png *.jpg)"));
     fileOpener.setViewMode(QFileDialog::List);
-    if(fileOpener.exec()){
-        QString fileName = fileOpener.selectedFiles().at(0);
-        if(image != NULL){
-            delete image;
-            delete imageData;
-        }
-        loadImage(&fileName);
+
+    if(!fileOpener.exec()){
+        return;
     }
+
+    QString fileName = fileOpener.selectedFiles().at(0);
+    if(imageExists()){
+        if(compressor->free()) LOG("Compressed image deallocated");
+        LOG("Original image deallocated");
+        delete image;
+    }
+    loadImage(&fileName);
 }
 
 MainWindow::~MainWindow()
 {
     delete image;
-    delete imageData;
+    delete compressor;
     delete ui;
 }
 
@@ -70,16 +99,16 @@ void MainWindow::on_compressButton_released()
     if(image == NULL){
         return;
     }
-
+    compressor->compress(image,ui->modifiedImage);
     for(int i=0;i<image->height();i++){
         QRgb* rowData = reinterpret_cast<QRgb*>(image->scanLine(i));
         for(int j=0;j<image->width();j++){
             QRgb* pixelData = &rowData[j];
             int index = j + (i*image->width());
 
-            imageData[index].r = qRed(*pixelData);
-            imageData[index].g = qGreen(*pixelData);
-            imageData[index].b = qBlue(*pixelData);
+            //imageData[index].r = qRed(*pixelData);
+            //imageData[index].g = qGreen(*pixelData);
+            //imageData[index].b = qBlue(*pixelData);
         }
     }
 }
