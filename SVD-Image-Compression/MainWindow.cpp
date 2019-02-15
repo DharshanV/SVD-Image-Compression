@@ -40,8 +40,6 @@ void MainWindow::loadImage(const QString* filePath){
     ui->pictureViewer->setScaledContents(true);
     double total = static_cast<double>(image->sizeInBytes())/MEGABYTE;
     ui->oFileSize->setText(QString::number(total) + " M");
-    imageData = new ImageData[image->width()*image->height()];
-
 }
 
 void MainWindow::on_openButton_released()
