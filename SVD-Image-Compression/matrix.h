@@ -198,6 +198,17 @@ ostream& operator<<(ostream& left, const Matrix<T>& right) {
 }
 
 template<typename T>
+ostream& operator<<(ostream& left,Matrix<T>& right) {
+    for (int i = 0; i < right.getRows(); i++) {
+        for (int j = 0; j < right.getColumns(); j++) {
+            left << (int)right[i][j] << " ";
+        }
+        cout << endl;
+    }
+    return left;
+}
+
+template<typename T>
 inline T& Matrix<T>::operator()(int i, int j)
 {
     if (0 <= i && i < rows && 0 <= j && j < columns) {

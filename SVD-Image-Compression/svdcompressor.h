@@ -5,7 +5,9 @@
 #include "jacobi_eigenvalue.h"
 #include "matrix.h"
 #include <QRgb>
+#include <math.h>
 
+using namespace std;
 class SVDCompressor
 {
 public:
@@ -17,14 +19,22 @@ private:
     void loadToMatrices();
     void initMatrices(int M,int N);
     void put(int i,int j,QRgb* pixelValue);
+    void deallocate();
+    Matrix<double>& getSquareMatrix();
 private:
+    int it_max = 100;
+    int it_num;
+    int rot_num;
+    bool compressed;
     QImage* oImage;
     QImage* mImage;
     struct RGB{
-        Matrix<unsigned char>* RGBMatrix;
+        Matrix<double>* RGBMatrix;
     };
     struct SVD{
-        Matrix<double>* SVDMatrix;
+        Matrix<double>* U;
+        Matrix<double>* SIG;
+        Matrix<double>* VT;
     };
     RGB RGBMatrices[3];
     SVD SVDMatrices[3];

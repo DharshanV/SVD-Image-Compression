@@ -79,7 +79,7 @@ void MainWindow::on_openButton_released()
 
     QString fileName = fileOpener.selectedFiles().at(0);
     if(imageExists()){
-        if(compressor->free()) LOG("Compressed image deallocated");
+        compressor->free();
         LOG("Original image deallocated");
         delete image;
     }
