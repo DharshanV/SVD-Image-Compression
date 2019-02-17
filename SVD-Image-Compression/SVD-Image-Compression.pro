@@ -32,7 +32,9 @@ SOURCES += \
 HEADERS += \
         MainWindow.h \
     svdcompressor.h \
-    jacobi_eigenvalue.h
+    jacobi_eigenvalue.h \
+    matrix.h \
+    imagematrix.h
 
 FORMS += \
         MainWindow.ui

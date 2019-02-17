@@ -10,7 +10,7 @@
 #endif
 
 #if DEBUG
-#define LOG(x) do { std::cerr << x; } while (0)
+#define LOG(x) do { std::cerr << x<<endl; } while (0)
 #else
 #define LOG(X)
 #endif
@@ -100,15 +100,4 @@ void MainWindow::on_compressButton_released()
         return;
     }
     compressor->compress(image,ui->modifiedImage);
-    for(int i=0;i<image->height();i++){
-        QRgb* rowData = reinterpret_cast<QRgb*>(image->scanLine(i));
-        for(int j=0;j<image->width();j++){
-            QRgb* pixelData = &rowData[j];
-            int index = j + (i*image->width());
-
-            //imageData[index].r = qRed(*pixelData);
-            //imageData[index].g = qGreen(*pixelData);
-            //imageData[index].b = qBlue(*pixelData);
-        }
-    }
 }
