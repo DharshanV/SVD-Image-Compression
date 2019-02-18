@@ -36,64 +36,34 @@ void SVDCompressor::loadToMatrices()
     Matrix<double> EV(N,N);
     Matrix<double> V(N,N);
 
-    cout<<"Starting copy image to A"<<endl;
-    for(int i=0;i<M;i++){
-        uchar* rowData = reinterpret_cast<uchar*>(oImage->scanLine(i));
-        for(int j=0;j<N;j++){
-            uchar* pixelValue = &rowData[j];
-            (*A)[i][j] = static_cast<double>(*pixelValue);
-        }
-    }
-    cout<<"Finished copying image to A\n"<<endl;
+    QElapsedTimer timer;
 
-    cout<<"Doing AT * A"<<endl;
-    solveForSquare(A,&S);
-    cout<<"Finished doing AT * A\n"<<endl;
+    timer.start();
 
-    cout<<"Solving for eigen's"<<endl;
-    jacobi_eigenvalue(N,S.getData(),it_max,EV.getData(),E.getData(),it_num,rot_num);
-    cout<<"Finished solving for eigen's"<<endl;
+    copyToA(oImage,A);
 
-    for(int i=0;i<A->getColumns();i++){
-        for(int j=0;j<A->getColumns();j++){
-            V[i][j] = EV[A->getColumns()-j-1][i];
-        }
-    }
+    QFuture<void> thread1 = QtConcurrent::run(solveForSquare,A,&S);
+    thread1.waitForFinished();
+
+    QFuture<void> thread2 = QtConcurrent::run(solveForEigen,N,S.getData(),EV.getData(),E.getData());
+    thread2.waitForFinished();
+
+    solveForV(A,&EV,&V);
 
     //SIG
-    int index = 0;
-    for(int i=A->getColumns()-1;i>=0;i--){
-        if(index>A->getRows()-1)break;
-        double temp = E[i][0];
-        if(temp < 0){
-            temp *= -1;
-        }
-        (*SIG)[index][index] = sqrt(temp);
-        index++;
-    }
+    solveForSigma(A,&E,SIG);
 
     //U
-    for(int i=0;i<A->getRows();i++){
-        for(int j=0;j<A->getRows();j++){
-            for(int k=0;k<A->getColumns();k++){
-                if((*SIG)[j][j] != 0.0){
-                    (*U)[i][j] += (1/(*SIG)[j][j])*((*A)[i][k] * V[k][j]);
-                }
-            }
-        }
-    }
+    QFuture<void> thread5 = QtConcurrent::run(solveForU,A,&V,SIG,U);
+    thread5.waitForFinished();
 
     //VT
-    (*VT) = V.transpose();
+    solveForVT(&V,VT);
 
-//    cout<<*A<<endl;
-//    cout<<"---------------------"<<endl;
-//    cout<<(*U)*(*SIG)*(*VT)<<endl;
-//    cout<<*U<<endl;
-//    cout<<"---------------------"<<endl;
-//    cout<<*SIG<<endl;
-//    cout<<"---------------------"<<endl;
-//    cout<<*VT<<endl;
+    cout<<"\nTotal time: "<<timer.elapsed()<<endl;
+    timer.invalidate();
+
+    //cout<<(*U)*(*SIG)*(*VT)<<endl;
 }
 
 void SVDCompressor::initMatrices()
@@ -114,17 +84,6 @@ void SVDCompressor::deallocate()
     delete VT;
 }
 
-void solveForSquare(Matrix<double>* A,Matrix<double>* S)
-{
-    for(int i=0;i<A->getColumns();i++){
-        for(int j=0;j<A->getColumns();j++){
-            for(int k=0;k<A->getRows();k++){
-                (*S)[i][j] += ((*A)[k][i]*(*A)[k][j]);
-            }
-        }
-    }
-}
-
 SVDCompressor::~SVDCompressor()
 {
     if(compressed){
@@ -132,7 +91,90 @@ SVDCompressor::~SVDCompressor()
     }
 }
 
-void solveForEigen(int n, double a[], int it_max, double v[], double d[], int&it_num, int&rot_num)
+void solveForSquare(Matrix<double>* A,Matrix<double>* S)
 {
+    cout<<"Solving for AT * A"<<endl;
+    for(int i=0;i<A->getColumns();i++){
+        for(int j=i;j<A->getColumns();j++){
+            for(int k=0;k<A->getRows();k++){
+                (*S)[i][j] += ((*A)[k][i]*(*A)[k][j]);
+            }
+            (*S)[j][i] = (*S)[i][j];
+        }
+    }
+    cout<<"Solved for AT * A\n"<<endl;
+}
+
+void copyToA(QImage*oImage, Matrix<double>*A)
+{
+    cout<<"Starting copy image to A"<<endl;
+    int M = oImage->height();
+    int N = oImage->width();
+    for(int i=0;i<M;i++){
+        uchar* rowData = reinterpret_cast<uchar*>(oImage->scanLine(i));
+        for(int j=0;j<N;j++){
+            uchar* pixelValue = &rowData[j];
+            (*A)[i][j] = static_cast<double>(*pixelValue);
+        }
+    }
+    cout<<"Finished copying image to A\n"<<endl;
+}
+
+void solveForEigen(int n, double a[], double v[], double d[])
+{
+    cout<<"Solving for eigen's"<<endl;
+    int it_max = 10;
+    int it_num;
+    int rot_num;
     jacobi_eigenvalue(n,a,it_max,v,d,it_num,rot_num);
+    cout<<"Solved for eigen's\n"<<endl;
+}
+
+void solveForU(Matrix<double>* A, Matrix<double>* V, Matrix<double>* SIG, Matrix<double>* U)
+{
+    cout<<"Solving for U"<<endl;
+    for(int i=0;i<A->getRows();i++){
+        for(int j=0;j<A->getRows();j++){
+            for(int k=0;k<A->getColumns();k++){
+                if((*SIG)[j][j] != 0.0){
+                    (*U)[i][j] += (1/(*SIG)[j][j])*((*A)[i][k] * (*V)[k][j]);
+                }
+            }
+        }
+    }
+    cout<<"Solved for U\n"<<endl;
+}
+
+void solveForV(Matrix<double>* A,Matrix<double>* EV,Matrix<double>* V)
+{
+    cout<<"Solving for V"<<endl;
+    for(int i=0;i<A->getColumns();i++){
+        for(int j=0;j<A->getColumns();j++){
+            (*V)[i][j] = (*EV)[A->getColumns()-j-1][i];
+        }
+    }
+    cout<<"Sovled for V\n"<<endl;
+}
+
+void solveForSigma(Matrix<double>*A, Matrix<double>*E, Matrix<double>*SIG)
+{
+    cout<<"Solving for sigma"<<endl;
+    int index = 0;
+    for(int i=A->getColumns()-1;i>=0;i--){
+        if(index>A->getRows()-1)break;
+        double temp = (*E)[i][0];
+        if(temp < 0){
+            temp *= -1;
+        }
+        (*SIG)[index][index] = sqrt(temp);
+        index++;
+    }
+    cout<<"Solved for sigma\n"<<endl;
+}
+
+void solveForVT(Matrix<double>*V, Matrix<double>*VT)
+{
+    cout<<"Solving for VT"<<endl;
+    (*VT) = V->transpose();
+    cout<<"Solved for VT\n"<<endl;
 }
