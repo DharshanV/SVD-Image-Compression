@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::loadImage(const QString* filePath){
     image = new QImage(*filePath);
+    *image = image->convertToFormat(QImage::Format_Grayscale8);
     loadImageToLable(image,ui->pictureViewer);
     loadImageSize(image,ui->oFileSize);
 }
@@ -99,5 +100,32 @@ void MainWindow::on_compressButton_released()
     if(image == NULL){
         return;
     }
-    compressor->compress(image,ui->modifiedImage);
+//    for(int i=0;i<image->height();i++){
+//        uchar* rowData = reinterpret_cast<uchar*>(image->scanLine(i));
+//        for(int j=0;j<image->width();j++){
+//            uchar* pixelValue = &rowData[j];
+//            cout<<*pixelValue<<" ";
+//        }
+//        cout<<endl;
+//    }
+//    cout<<endl<<endl;;
+    compressor->compress(image,NULL);
+}
+
+void changingImagePixle(){
+//    for (int y = 0; y < image->height()-5; ++y) {
+//        for (int x = 0; x < image->width()-5; ++x) {
+//            image->setPixel(x,y,qRgb(185,185,185));
+//        }
+//    }
+
+//    for (int y = 0; y < image->height(); ++y) {
+//        uchar* rowData = reinterpret_cast<uchar*>(image->scanLine(y));
+//        for (int x = 0; x < image->width(); ++x) {
+//            uchar* pixelValue = &rowData[x];
+//            cout<<(int)*pixelValue<<" ";
+//        }
+//        cout<<endl;
+//    }
+//    loadImageToLable(image,ui->pictureViewer);
 }

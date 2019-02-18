@@ -44,9 +44,9 @@ public:
     ~Matrix();
     Matrix<T>& operator+=(const Matrix<T>& right);
     T& operator()(int i,int j);
-    //T operator()(int i,int j) const;
+    T operator()(int i,int j) const;
     MatrixRow<T> operator[](int i);
-    //ConstMatrixRow<T> operator[](int i) const;
+    ConstMatrixRow<T> operator[](int i) const;
     T* getData(){return elements;}
 
     void put(int i,int j,T value){
@@ -198,17 +198,6 @@ ostream& operator<<(ostream& left, const Matrix<T>& right) {
 }
 
 template<typename T>
-ostream& operator<<(ostream& left,Matrix<T>& right) {
-    for (int i = 0; i < right.getRows(); i++) {
-        for (int j = 0; j < right.getColumns(); j++) {
-            left << (int)right[i][j] << " ";
-        }
-        cout << endl;
-    }
-    return left;
-}
-
-template<typename T>
 inline T& Matrix<T>::operator()(int i, int j)
 {
     if (0 <= i && i < rows && 0 <= j && j < columns) {
@@ -216,13 +205,13 @@ inline T& Matrix<T>::operator()(int i, int j)
     }
 }
 
-//template<typename T>
-//inline T Matrix<T>::operator()(int i, int j) const
-//{
-//    if (0 <= i && i < rows && 0 <= j && j < columns) {
-//        return elements[i*columns + j];
-//    }
-//}
+template<typename T>
+inline T Matrix<T>::operator()(int i, int j) const
+{
+    if (0 <= i && i < rows && 0 <= j && j < columns) {
+        return elements[i*columns + j];
+    }
+}
 
 template<typename T>
 inline MatrixRow<T> Matrix<T>::operator[](int i)
@@ -230,11 +219,11 @@ inline MatrixRow<T> Matrix<T>::operator[](int i)
     return MatrixRow<T>(this, i);
 }
 
-//template<typename T>
-//inline ConstMatrixRow<T> Matrix<T>::operator[](int i) const
-//{
- //   return ConstMatrixRow<T>(this, i);
-//}
+template<typename T>
+inline ConstMatrixRow<T> Matrix<T>::operator[](int i) const
+{
+    return ConstMatrixRow<T>(this, i);
+}
 
 template<typename T>
 inline  int Matrix<T>::getRows() const

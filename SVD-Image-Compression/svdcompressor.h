@@ -6,6 +6,7 @@
 #include "matrix.h"
 #include <QRgb>
 #include <math.h>
+#include <QtConcurrent/QtConcurrent>
 
 using namespace std;
 class SVDCompressor
@@ -13,31 +14,29 @@ class SVDCompressor
 public:
     SVDCompressor();
     ~SVDCompressor();
-    bool free();
+    void free();
     void compress(QImage* oImage,QLabel* output);
 private:
     void loadToMatrices();
-    void initMatrices(int M,int N);
-    void put(int i,int j,QRgb* pixelValue);
+    void initMatrices();
     void deallocate();
     Matrix<double>& getSquareMatrix();
 private:
-    int it_max = 100;
+    int M, N;
+    int it_max = 10;
     int it_num;
     int rot_num;
     bool compressed;
     QImage* oImage;
     QImage* mImage;
-    struct RGB{
-        Matrix<double>* RGBMatrix;
-    };
-    struct SVD{
-        Matrix<double>* U;
-        Matrix<double>* SIG;
-        Matrix<double>* VT;
-    };
-    RGB RGBMatrices[3];
-    SVD SVDMatrices[3];
+    Matrix<double>* A;
+    Matrix<double>* U;
+    Matrix<double>* SIG;
+    Matrix<double>* VT;
 };
+
+void solveForSquare(Matrix<double>* A,Matrix<double>* S);
+void solveForEigen(int n, double a[], int it_max, double v[],
+                   double d[], int &it_num, int &rot_num);
 
 #endif // SVDCOMPRESSOR_H
