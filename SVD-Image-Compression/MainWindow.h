@@ -23,6 +23,8 @@ private slots:
 
     void on_compressButton_released();
 
+    void on_kSlider_valueChanged(int value);
+
 private:
     void loadImage(const QString* filePath);
     void loadImageSize(QImage* i,QLabel* label);

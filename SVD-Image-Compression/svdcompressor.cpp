@@ -15,8 +15,12 @@ void SVDCompressor::free()
     }
 }
 
-void SVDCompressor::compress(QImage* oImage,QLabel* output)
+void SVDCompressor::compress(QImage* oImage,QLabel* output,int k)
 {
+    if(compressed){
+        loadToLabel(output,k);
+        return;
+    }
     this->oImage = oImage;
     if(this->oImage == NULL) return;
 
@@ -25,9 +29,14 @@ void SVDCompressor::compress(QImage* oImage,QLabel* output)
 
     initMatrices();
     loadToMatrices();
-    loadToLabel(output);
+    loadToLabel(output,k);
 
     compressed = true;
+}
+
+QString SVDCompressor::getFileSize()
+{
+    return QString::number(static_cast<double>(mImage->sizeInBytes())/1048576);
 }
 
 void SVDCompressor::loadToMatrices()
@@ -67,12 +76,19 @@ void SVDCompressor::loadToMatrices()
     //cout<<(*U)*(*SIG)*(*VT)<<endl;
 }
 
-void SVDCompressor::loadToLabel(QLabel* output)
+void SVDCompressor::loadToLabel(QLabel* output,int k)
 {
-    Matrix<double> finalMatrix = (*U)*(*SIG)*(*VT);
+    Matrix<double> O(M,N);
+    for(int i=0;i<M;i++){
+        for(int j=0;j<N;j++){
+            for(int mod=0;mod<k;mod++){
+                O[i][j] += (*U)[i][mod] * (*SIG)[mod][mod] * (*VT)[mod][j];
+            }
+        }
+    }
     for (int y = 0; y < mImage->height(); ++y) {
         for (int x = 0; x < mImage->width(); ++x) {
-            int pixelValue = static_cast<int>(finalMatrix[y][x]);
+            int pixelValue = static_cast<int>(O[y][x]);
             mImage->setPixel(x,y,qRgb(pixelValue,pixelValue,pixelValue));
         }
     }

@@ -148,7 +148,7 @@ Matrix<T> operator*(const Matrix<T>& left, const Matrix<T>& right)
 {
     if (left.getColumns() != right.getRows()) {
     }
-    Matrix<T> temp(left.getRows(), right.getColumns(), 0);
+    Matrix<T> temp(left.getRows(), right.getColumns());
     for (int i = 0; i < left.getRows(); i++)
     {
        for (int j = 0; j < right.getColumns(); j++)

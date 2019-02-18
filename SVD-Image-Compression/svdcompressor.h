@@ -15,10 +15,11 @@ public:
     SVDCompressor();
     ~SVDCompressor();
     void free();
-    void compress(QImage* oImage,QLabel* output);
+    void compress(QImage* oImage,QLabel* output,int k);
+    QString getFileSize();
 private:
     void loadToMatrices();
-    void loadToLabel(QLabel* output);
+    void loadToLabel(QLabel* output,int k);
     void initMatrices();
     void deallocate();
     Matrix<double>& getSquareMatrix();

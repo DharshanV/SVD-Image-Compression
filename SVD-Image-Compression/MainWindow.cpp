@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     image = NULL;
     compressor = new SVDCompressor();
+    ui->kSlider->setEnabled(false);
 }
 
 void MainWindow::loadImage(const QString* filePath){
@@ -47,6 +48,11 @@ void MainWindow::loadImage(const QString* filePath){
     *image = image->convertToFormat(QImage::Format_Grayscale8);
     loadImageToLable(image,ui->pictureViewer);
     loadImageSize(image,ui->oFileSize);
+
+    ui->kSlider->setEnabled(true);
+    ui->kSlider->setMinimum(1);
+    ui->kSlider->setMaximum(min(image->height(),image->width()));
+    ui->kValue->setText("1");
 }
 
 void MainWindow::loadImageSize(QImage* i,QLabel* label)
@@ -109,7 +115,8 @@ void MainWindow::on_compressButton_released()
 //        cout<<endl;
 //    }
 //    cout<<endl<<endl;;
-    compressor->compress(image,ui->modifiedImage);
+    compressor->compress(image,ui->modifiedImage,ui->kValue->text().toInt());
+    ui->mFileSize->setText(compressor->getFileSize() + " M");
 }
 
 void changingImagePixle(){
@@ -128,4 +135,9 @@ void changingImagePixle(){
 //        cout<<endl;
 //    }
 //    loadImageToLable(image,ui->pictureViewer);
+}
+
+void MainWindow::on_kSlider_valueChanged(int value)
+{
+    ui->kValue->setText(QString::number(value));
 }
