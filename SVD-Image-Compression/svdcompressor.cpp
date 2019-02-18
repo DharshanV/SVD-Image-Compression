@@ -19,12 +19,13 @@ void SVDCompressor::compress(QImage* oImage,QLabel* output)
 {
     this->oImage = oImage;
     if(this->oImage == NULL) return;
-    output = NULL;
+
     M = oImage->height();
     N = oImage->width();
 
     initMatrices();
     loadToMatrices();
+    loadToLabel(output);
 
     compressed = true;
 }
@@ -66,6 +67,20 @@ void SVDCompressor::loadToMatrices()
     //cout<<(*U)*(*SIG)*(*VT)<<endl;
 }
 
+void SVDCompressor::loadToLabel(QLabel* output)
+{
+    Matrix<double> finalMatrix = (*U)*(*SIG)*(*VT);
+    for (int y = 0; y < mImage->height(); ++y) {
+        for (int x = 0; x < mImage->width(); ++x) {
+            int pixelValue = static_cast<int>(finalMatrix[y][x]);
+            mImage->setPixel(x,y,qRgb(pixelValue,pixelValue,pixelValue));
+        }
+    }
+    QPixmap pix = QPixmap::fromImage(*mImage);
+    output->setPixmap(pix);
+    output->setScaledContents(true);
+}
+
 void SVDCompressor::initMatrices()
 {
     cout<<"Allocated matrices"<<endl;
@@ -73,6 +88,7 @@ void SVDCompressor::initMatrices()
     U = new Matrix<double>(A->getRows(),A->getRows());
     SIG = new Matrix<double>(A->getRows(),A->getColumns());
     VT = new Matrix<double>(A->getColumns(),A->getColumns());
+    mImage = new QImage(M,N,QImage::Format_Grayscale8);
 }
 
 void SVDCompressor::deallocate()
@@ -82,6 +98,7 @@ void SVDCompressor::deallocate()
     delete U;
     delete SIG;
     delete VT;
+    delete mImage;
 }
 
 SVDCompressor::~SVDCompressor()
@@ -123,7 +140,7 @@ void copyToA(QImage*oImage, Matrix<double>*A)
 void solveForEigen(int n, double a[], double v[], double d[])
 {
     cout<<"Solving for eigen's"<<endl;
-    int it_max = 10;
+    int it_max = 5;
     int it_num;
     int rot_num;
     jacobi_eigenvalue(n,a,it_max,v,d,it_num,rot_num);

@@ -18,6 +18,7 @@ public:
     void compress(QImage* oImage,QLabel* output);
 private:
     void loadToMatrices();
+    void loadToLabel(QLabel* output);
     void initMatrices();
     void deallocate();
     Matrix<double>& getSquareMatrix();

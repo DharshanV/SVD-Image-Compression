@@ -109,7 +109,7 @@ void MainWindow::on_compressButton_released()
 //        cout<<endl;
 //    }
 //    cout<<endl<<endl;;
-    compressor->compress(image,NULL);
+    compressor->compress(image,ui->modifiedImage);
 }
 
 void changingImagePixle(){
