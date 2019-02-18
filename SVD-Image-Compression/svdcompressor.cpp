@@ -84,12 +84,8 @@ void SVDCompressor::loadToLabel(QLabel* output,int k)
             for(int mod=0;mod<k;mod++){
                 O[i][j] += (*U)[i][mod] * (*SIG)[mod][mod] * (*VT)[mod][j];
             }
-        }
-    }
-    for (int y = 0; y < mImage->height(); ++y) {
-        for (int x = 0; x < mImage->width(); ++x) {
-            int pixelValue = static_cast<int>(O[y][x]);
-            mImage->setPixel(x,y,qRgb(pixelValue,pixelValue,pixelValue));
+            int pixelValue = static_cast<int>(O[i][j]);
+            mImage->setPixel(j,i,qRgb(pixelValue,pixelValue,pixelValue));
         }
     }
     QPixmap pix = QPixmap::fromImage(*mImage);
