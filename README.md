@@ -9,7 +9,7 @@ I list the end results of the compression below. There is much more imporvements
 - Image width, and height is 500.
 - Left: Original image
 - Right: Compressed image
-- K (Number of Singular values)
+- K (Number of Singular values), range of K is between 1 and 500.
 
 1. K = 10
 ![alt text](Images/Compression_10.PNG)
