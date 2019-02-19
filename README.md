@@ -12,10 +12,10 @@ I list the end results of the compression below. There is much more imporvements
 - K (Number of Singular values)
 
 1. K = 10
-![alt text](SVD-Image-Compression/Images/Compression_10.PNG)
+![alt text](Images/Compression_10.PNG)
 
 2. K = 50
-![alt text](SVD-Image-Compression/Images/Compression_50.PNG)
+![alt text](Images/Compression_50.PNG)
 
 3. K = 150 
 ![alt text](SVD-Image-Compression/Images/Compression_150.PNG)
